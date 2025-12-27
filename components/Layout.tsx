@@ -47,7 +47,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
       </main>
 
       <footer className="p-4 text-center text-gray-400 text-xs">
-        &copy; {new Date().getFullYear()} Serralheria Pro - Gestão Inteligente
+        &copy; {new Date().getFullYear()} Serralheria Pro - Orçamentos Profissionais
       </footer>
     </div>
   );

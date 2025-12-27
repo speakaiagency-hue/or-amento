@@ -10,11 +10,11 @@ export enum MaterialType {
 export interface QuoteItem {
   id: string;
   name: string;
-  width: number; 
-  height: number;
-  quantity: number;
+  width: number | string; 
+  height: number | string;
+  quantity: number | string;
   material: MaterialType;
-  pricePerUnit: number;
+  pricePerUnit: number | string;
   description: string;
   image?: string; // base64
 }
@@ -39,7 +39,6 @@ export interface Quote {
   discount: number;
   total: number;
   status: 'pending' | 'approved' | 'completed' | 'cancelled';
-  aiAnalysis?: string;
 }
 
 export interface AppState {

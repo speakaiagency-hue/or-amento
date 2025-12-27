@@ -72,8 +72,9 @@ const App: React.FC = () => {
     q.clientPhone.includes(searchQuery)
   );
 
+  // Fix: Convert pricePerUnit and quantity to Number to avoid arithmetic errors with string|number types
   const statsData = [
-    { name: 'Materiais', value: quotes.reduce((acc, q) => acc + q.items.reduce((iAcc, item) => iAcc + (item.pricePerUnit * item.quantity), 0), 0) },
+    { name: 'Materiais', value: quotes.reduce((acc, q) => acc + q.items.reduce((iAcc, item) => iAcc + (Number(item.pricePerUnit || 0) * Number(item.quantity || 0)), 0), 0) },
     { name: 'Mão de Obra', value: quotes.reduce((acc, q) => acc + q.laborCost, 0) }
   ];
 

@@ -25,11 +25,11 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
     const newItem: QuoteItem = {
       id: Math.random().toString(36).substr(2, 9),
       name: '',
-      width: 0,
-      height: 0,
+      width: '',
+      height: '',
       quantity: 1,
       material: MaterialType.IRON,
-      pricePerUnit: 0,
+      pricePerUnit: '',
       description: ''
     };
     setItems([...items, newItem]);
@@ -62,6 +62,11 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
   const total = calculateSubtotal() + currentLaborCost;
 
   const generatePDF = async () => {
+    if (!clientName) {
+      alert("Por favor, preencha o nome do cliente.");
+      return;
+    }
+    
     setIsGeneratingPdf(true);
     const quoteData: Quote = {
       id: initialQuote?.id || 'NOVO',
@@ -82,7 +87,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
     const root = ReactDOM.createRoot(container);
     root.render(<PDFTemplate quote={quoteData} business={business} />);
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     const element = document.getElementById('pdf-render-target');
     const opt = {
@@ -97,6 +102,9 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
     window.html2pdf().from(element).set(opt).save().then(() => {
       setIsGeneratingPdf(false);
       root.unmount();
+    }).catch((err: any) => {
+      console.error(err);
+      setIsGeneratingPdf(false);
     });
   };
 
@@ -179,7 +187,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
             <button
               type="button"
               onClick={() => removeItem(item.id)}
-              className="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded-full"
+              className="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded-full z-10"
             >
               <Trash2 size={20} />
             </button>
@@ -192,7 +200,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
                   className="mt-1 block w-full rounded-md border-gray-200 p-3 border focus:ring-1 focus:ring-orange-500 text-base"
                   value={item.name}
                   onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                  placeholder="Ex: Grade de Proteção"
+                  placeholder="Ex: Portão de Correr"
                 />
               </div>
 
@@ -235,8 +243,8 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
                   step="0.01"
                   placeholder="0.00"
                   className="mt-1 block w-full rounded-md border-gray-200 p-3 border text-base"
-                  value={item.width || ''}
-                  onChange={(e) => updateItem(item.id, 'width', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  value={item.width}
+                  onChange={(e) => updateItem(item.id, 'width', e.target.value === '' ? '' : e.target.value)}
                 />
               </div>
               <div>
@@ -246,8 +254,8 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
                   step="0.01"
                   placeholder="0.00"
                   className="mt-1 block w-full rounded-md border-gray-200 p-3 border text-base"
-                  value={item.height || ''}
-                  onChange={(e) => updateItem(item.id, 'height', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  value={item.height}
+                  onChange={(e) => updateItem(item.id, 'height', e.target.value === '' ? '' : e.target.value)}
                 />
               </div>
               <div>
@@ -256,8 +264,8 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
                   type="number"
                   placeholder="1"
                   className="mt-1 block w-full rounded-md border-gray-200 p-3 border text-base"
-                  value={item.quantity || ''}
-                  onChange={(e) => updateItem(item.id, 'quantity', e.target.value === '' ? '' : parseInt(e.target.value))}
+                  value={item.quantity}
+                  onChange={(e) => updateItem(item.id, 'quantity', e.target.value === '' ? '' : e.target.value)}
                 />
               </div>
               <div>
@@ -266,8 +274,8 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
                   type="number"
                   placeholder="0.00"
                   className="mt-1 block w-full rounded-md border-gray-200 p-3 border text-base font-bold text-orange-700"
-                  value={item.pricePerUnit || ''}
-                  onChange={(e) => updateItem(item.id, 'pricePerUnit', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  value={item.pricePerUnit}
+                  onChange={(e) => updateItem(item.id, 'pricePerUnit', e.target.value === '' ? '' : e.target.value)}
                 />
               </div>
               <div className="col-span-2">
@@ -287,15 +295,15 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
 
       <div className="bg-slate-900 text-white p-5 rounded-2xl shadow-lg space-y-4">
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest">Custo Adicional (Ex: Frete ou Mão de Obra)</label>
+          <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest text-center">Custo Adicional (Frete / Mão de Obra)</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold">R$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">R$</span>
             <input
               type="number"
               placeholder="0.00"
-              className="w-full bg-slate-800 border-none rounded-xl p-4 pl-10 text-white text-xl font-bold focus:ring-2 focus:ring-orange-500 outline-none"
-              value={laborCost || ''}
-              onChange={(e) => setLaborCost(e.target.value === '' ? '' : parseFloat(e.target.value))}
+              className="w-full bg-slate-800 border-none rounded-xl p-4 pl-12 text-white text-2xl font-black focus:ring-2 focus:ring-orange-500 outline-none text-center"
+              value={laborCost}
+              onChange={(e) => setLaborCost(e.target.value === '' ? '' : e.target.value)}
             />
           </div>
         </div>
@@ -305,7 +313,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({ onSave, initialQuote, busi
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 sticky bottom-6 pb-4 bg-gray-50/90 backdrop-blur-md pt-2">
+      <div className="flex flex-col gap-3 sticky bottom-6 pb-4 bg-gray-50/90 backdrop-blur-md pt-2 px-1">
         <button
           type="button"
           onClick={generatePDF}
